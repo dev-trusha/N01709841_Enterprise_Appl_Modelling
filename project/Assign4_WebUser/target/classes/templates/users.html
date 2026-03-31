@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Web Users</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #3498db; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        tr:hover { background-color: #f5f5f5; }
+        .nav { margin-bottom: 20px; }
+        .nav a { margin-right: 15px; color: #3498db; text-decoration: none; }
+        .empty { color: #999; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a th:href="@{/users}">View All Users</a>
+        <a th:href="@{/users/add}">Add New User</a>
+    </div>
+
+    <h1>Registered Web Users</h1>
+
+    <div th:if="${#lists.isEmpty(users)}" class="empty">No users registered yet.</div>
+
+    <table th:if="${!#lists.isEmpty(users)}">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>State of User</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.password}"></td>
+                <td th:text="${user.stateofuser}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
