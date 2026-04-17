@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${appointment.appointmentId == null} ? 'Schedule Appointment' : 'Edit Appointment'">
+        Appointment Form
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-danger px-4">
+    <span class="navbar-brand fw-bold">&#x1F3E5; Hospital Management System</span>
+    <span class="text-white small">Appointment Service &nbsp;|&nbsp; Port 8083</span>
+</nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"
+                        th:text="${appointment.appointmentId == null}
+                                    ? 'Schedule New Appointment'
+                                    : 'Edit Appointment #' + ${appointment.appointmentId}">
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    <form th:action="${appointment.appointmentId == null}
+                                        ? @{/appointments/add}
+                                        : @{/appointments/edit/{id}(id=${appointment.appointmentId})}"
+                          th:object="${appointment}" method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Appointment Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{appointmentNumber}"
+                                   required placeholder="e.g. APT-004">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Appointment Type <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{appointmentType}"
+                                   required placeholder="e.g. General Checkup, Cardiology…">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" th:field="*{appointmentDate}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control" th:field="*{appointmentDescription}"
+                                      rows="2" placeholder="Brief notes…"></textarea>
+                        </div>
+
+                        <!--
+                            Patient dropdown
+                            List populated by: RestTemplate.exchange(GET :8081/api/patients)
+                            Shows a warning if Patient Service is not running.
+                        -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Patient
+                                <span class="badge bg-primary">fetched via RestTemplate from :8081</span>
+                            </label>
+                            <select class="form-select" th:field="*{appointmentPatientId}" required>
+                                <option value="">-- Select Patient --</option>
+                                <option th:each="p : ${patients}"
+                                        th:value="${p.patientId}"
+                                        th:text="${p.patientName} + '  (' + ${p.patientEmail} + ')'">
+                                </option>
+                            </select>
+                            <div th:if="${#lists.isEmpty(patients)}"
+                                 class="form-text text-warning fw-semibold">
+                                ⚠ Patient Service (port 8081) is unreachable — start it first.
+                            </div>
+                        </div>
+
+                        <!--
+                            Doctor dropdown
+                            List populated by: RestTemplate.exchange(GET :8082/api/doctors)
+                        -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Doctor
+                                <span class="badge bg-success">fetched via RestTemplate from :8082</span>
+                            </label>
+                            <select class="form-select" th:field="*{appointmentDoctorId}" required>
+                                <option value="">-- Select Doctor --</option>
+                                <option th:each="d : ${doctors}"
+                                        th:value="${d.doctorsId}"
+                                        th:text="${d.doctorsName} + '  (' + ${d.doctorsEmail} + ')'">
+                                </option>
+                            </select>
+                            <div th:if="${#lists.isEmpty(doctors)}"
+                                 class="form-text text-warning fw-semibold">
+                                ⚠ Doctor Service (port 8082) is unreachable — start it first.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">Save Appointment</button>
+                            <a th:href="@{/appointments}" class="btn btn-secondary">Cancel</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

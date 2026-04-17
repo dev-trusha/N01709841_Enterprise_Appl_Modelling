@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointments – Hospital Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-danger px-4">
+    <span class="navbar-brand fw-bold">&#x1F3E5; Hospital Management System</span>
+    <span class="text-white small">Appointment Service &nbsp;|&nbsp; Port 8083</span>
+</nav>
+
+<div class="container mt-4">
+    <h2 class="mb-1">Appointment Management</h2>
+    <p class="text-muted small mb-3">
+        Patient names resolved via
+        <span class="badge bg-primary">RestTemplate → :8081</span>
+        &nbsp; Doctor names resolved via
+        <span class="badge bg-success">RestTemplate → :8082</span>
+    </p>
+
+    <!-- searchAppointments() -->
+    <form th:action="@{/appointments/search}" method="get" class="row g-2 mb-3">
+        <div class="col-sm-4">
+            <input type="text" name="type" class="form-control"
+                   placeholder="Search by appointment type…" th:value="${searchType}">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-secondary">Search</button>
+            <a th:href="@{/appointments}" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    </form>
+
+    <!-- addAppointments() -->
+    <a th:href="@{/appointments/add}" class="btn btn-danger mb-3">+ Schedule New Appointment</a>
+
+    <table class="table table-bordered table-hover table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Appt #</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Patient <span class="badge bg-primary">:8081</span></th>
+                <th>Doctor  <span class="badge bg-success">:8082</span></th>
+                <th>Description</th>
+                <th style="width:150px">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="v : ${appointmentViews}">
+                <td th:text="${v.appointment.appointmentId}"></td>
+                <td th:text="${v.appointment.appointmentNumber}"></td>
+                <td th:text="${v.appointment.appointmentType}"></td>
+                <td th:text="${v.appointment.appointmentDate}"></td>
+                <!-- Names fetched from Patient/Doctor services via RestTemplate -->
+                <td th:text="${v.patientName}"></td>
+                <td th:text="${v.doctorName}"></td>
+                <td th:text="${v.appointment.appointmentDescription}"></td>
+                <td>
+                    <!-- editAppointments() -->
+                    <a th:href="@{/appointments/edit/{id}(id=${v.appointment.appointmentId})}"
+                       class="btn btn-sm btn-warning me-1">Edit</a>
+                    <!-- deleteAppointments() -->
+                    <a th:href="@{/appointments/delete/{id}(id=${v.appointment.appointmentId})}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this appointment?')">Delete</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(appointmentViews)}">
+                <td colspan="8" class="text-center text-muted fst-italic">No appointments found.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="text-muted small mt-2">
+        JSON API: <code>GET http://localhost:8083/api/appointments</code>
+        &nbsp;|&nbsp;
+        H2 Console: <a href="/h2-console" target="_blank">/h2-console</a>
+    </p>
+</div>
+
+</body>
+</html>
